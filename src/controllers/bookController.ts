@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Request, Response } from "express";
-import { StatusCodes } from "http-status-codes";
+import { createResponse, createErrorResponse } from "../utils/createResponse";
 import {
   createBook,
   findBooksByFilter,
@@ -10,10 +10,10 @@ import {
 const getBooks = async (req: Request, res: Response) => {
   try {
     const findBooks = await findBooksByFilter();
-    res.status(StatusCodes.OK).send(findBooks);
+    createResponse(res, "Books returned successfully.", findBooks);
   } catch (error) {
     // @ts-ignore
-    res.status(500).send(error.message);
+    createErrorResponse(req, res, error.message, error.statusCode, error.data);
   }
 };
 
@@ -30,25 +30,25 @@ const getBook = async (req: Request, res: Response) => {
         ? scores.reduce((acc, score) => acc + score, 0) / scores.length
         : null;
 
-    res.json({
+    createResponse(res, "Book detail returned successfully.", {
       id: findBook?.id,
       name: findBook?.name,
       score: averageScore ? averageScore.toFixed(2) : -1,
     });
   } catch (error) {
     // @ts-ignore
-    res.status(500).send(error.message);
+    createErrorResponse(req, res, error.message, error.statusCode, error.data);
   }
 };
 
 const addBook = async (req: Request, res: Response) => {
   try {
     const { name } = req.body;
-    await createBook({ name });
-    res.status(StatusCodes.CREATED).send();
+    const createdBook = await createBook({ name });
+    createResponse(res, "Book created successfully.", createdBook);
   } catch (error) {
     // @ts-ignore
-    res.status(500).send(error.message);
+    createErrorResponse(req, res, error.message, error.statusCode, error.data);
   }
 };
 

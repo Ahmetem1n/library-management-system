@@ -1,3 +1,4 @@
+import CustomError from "../errors";
 import { UserBook } from "../models";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,7 +36,7 @@ const findOneUserBookByFilter = async (
   });
 
   if (!findUserBook && throwError)
-    throw new Error("User book does not exists.");
+    throw new CustomError.NotFoundError("User book does not exists.");
 
   return findUserBook;
 };

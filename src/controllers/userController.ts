@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
+import { createResponse, createErrorResponse } from "../utils/createResponse";
 import { findOneBookByFilter } from "../services/bookService";
 import {
   createUserBook,
@@ -16,10 +17,10 @@ import {
 const getUsers = async (req: Request, res: Response) => {
   try {
     const findUsers = await findUsersByFilter();
-    res.status(StatusCodes.OK).send(findUsers);
+    createResponse(res, "Users returned successfully.", findUsers);
   } catch (error) {
     // @ts-ignore
-    res.status(500).send(error.message);
+    createErrorResponse(req, res, error.message, error.statusCode, error.data);
   }
 };
 
@@ -48,21 +49,21 @@ const getUser = async (req: Request, res: Response) => {
       },
     };
 
-    res.json(userResponse);
+    createResponse(res, "User detail returned successfully.", userResponse);
   } catch (error) {
     // @ts-ignore
-    res.status(500).send(error.message);
+    createErrorResponse(req, res, error.message, error.statusCode, error.data);
   }
 };
 
 const addUser = async (req: Request, res: Response) => {
   try {
     const { name } = req.body;
-    await createUser({ name });
-    res.status(StatusCodes.CREATED).send();
+    const createdUser = await createUser({ name });
+    createResponse(res, "User detail returned successfully.", createdUser);
   } catch (error) {
     // @ts-ignore
-    res.status(500).send(error.message);
+    createErrorResponse(req, res, error.message, error.statusCode, error.data);
   }
 };
 
@@ -78,20 +79,23 @@ const borrowBook = async (req: Request, res: Response) => {
       false
     );
     if (findUserBook) {
-      return res.status(500).send(
+      return createErrorResponse(
+        req,
+        res,
         // @ts-ignore
         findUserBook.userId === userId
           ? "This book is already with this user."
-          : "This book is currently with another user."
+          : "This book is currently with another user.",
+        StatusCodes.BAD_REQUEST
       );
     }
 
     await createUserBook({ userId, bookId, borrowDate: new Date() });
 
-    res.status(StatusCodes.NO_CONTENT).send();
+    createResponse(res, "User borrowed book successfully.");
   } catch (error) {
     // @ts-ignore
-    res.status(500).send(error.message);
+    createErrorResponse(req, res, error.message, error.statusCode, error.data);
   }
 };
 
@@ -109,11 +113,12 @@ const returnBook = async (req: Request, res: Response) => {
     );
 
     if (!findUserBook) {
-      return res
-        .status(500)
-        .send(
-          "This book cannot be returned because it is not currently with this user."
-        );
+      return createErrorResponse(
+        req,
+        res,
+        "This book cannot be returned because it is not currently with this user.",
+        StatusCodes.BAD_REQUEST
+      );
     }
 
     // @ts-ignore
@@ -121,10 +126,10 @@ const returnBook = async (req: Request, res: Response) => {
     if (score) findUserBook.score = score;
     await findUserBook?.save();
 
-    res.status(StatusCodes.NO_CONTENT).send();
+    createResponse(res, "User returned book successfully.");
   } catch (error) {
     // @ts-ignore
-    res.status(500).send(error.message);
+    createErrorResponse(req, res, error.message, error.statusCode, error.data);
   }
 };
 

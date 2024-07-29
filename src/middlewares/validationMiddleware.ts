@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Joi from "joi";
 import { NextFunction, Request, Response } from "express";
+import { createErrorResponse } from "../utils/createResponse";
 
 const validate = (schema: {
   params?: any;
@@ -29,7 +30,7 @@ const validate = (schema: {
         .replace("params.", "")
         .replace("query.", "");
 
-      throw new Error(message);
+      return createErrorResponse(req, res, message);
     }
 
     if (value.params) req.params = value.params;

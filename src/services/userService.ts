@@ -1,3 +1,4 @@
+import CustomError from "../errors";
 import { Op } from "sequelize";
 import { Book, User, UserBook } from "../models";
 
@@ -55,7 +56,8 @@ const findOneUserByFilter = async (
     order: [[orderBy, orderSort]],
   });
 
-  if (!findUser && throwError) throw new Error("User does not exists.");
+  if (!findUser && throwError)
+    throw new CustomError.NotFoundError("User does not exists.");
 
   return findUser;
 };
@@ -73,7 +75,8 @@ const getUserWithBookHistory = async (
     ],
   });
 
-  if (!findUser && throwError) throw new Error("User does not exists.");
+  if (!findUser && throwError)
+    throw new CustomError.NotFoundError("User does not exists.");
 
   return findUser;
 };
