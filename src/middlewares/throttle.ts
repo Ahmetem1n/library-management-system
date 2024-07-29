@@ -4,8 +4,8 @@ import { Request, Response } from "express";
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
-  max: 3,
-    handler: function  (req: Request, res: Response) {    
+  max: 30,
+  handler: function (req: Request, res: Response) {
     throw new Error(
       "Your request has been throttled, please try again after 1 min."
     );
