@@ -60,7 +60,7 @@ const addUser = async (req: Request, res: Response) => {
   try {
     const { name } = req.body;
     const createdUser = await createUser({ name });
-    createResponse(res, "User detail returned successfully.", createdUser);
+    createResponse(res, "User created successfully.", createdUser);
   } catch (error) {
     // @ts-ignore
     createErrorResponse(req, res, error.message, error.statusCode, error.data);
